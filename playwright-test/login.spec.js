@@ -1,57 +1,57 @@
 // @ts-check
 import { test, expect } from '@playwright/test';
 
-test.describe('Login Form Validation', () => {
+test.describe('ログインフォームバリデーション', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('http://localhost:5173/login');
   });
 
-  test('email password isEmpty', async ({ page }) => {
+  test('メールアドレスとパスワードが空欄', async ({ page }) => {
     await page.click("#login-button");
-    const emailError = await page.locator('p').nth(0);
-    await expect(emailError).toHaveText('メールアドレスが空欄です');
-    const passwordError = await page.locator('p').nth(1);
-    await expect(passwordError).toHaveText('パスワードが空欄です');
+    const emailError = await page.locator('p').nth(1);
+    await expect(emailError).toHaveText('メールアドレスを入力してください。');
+    const passwordError = await page.locator('p').nth(2);
+    await expect(passwordError).toHaveText('パスワードを入力してください。');
   });
 
-  test('email includes @', async ({ page }) => {
-    await page.fill('input[type="email"]', 'testest');
+  test('メールアドレスの型不一致', async ({ page }) => {
+    await page.fill('input[type="email"]', 'testest@a');
     await page.fill('input[type="password"]', 'Pass1234');
     await page.click("#login-button");
   
-    const emailError = await page.locator('p').nth(0);
-    await expect(emailError).toHaveText('メールアドレスには「@」を含んでください');
+    const emailError = await page.locator('p').nth(1);
+    await expect(emailError).toHaveText('有効なメールアドレスを入力してください。');
   });
 
   test('passoword type error', async ({ page }) => {
     await page.fill('input[type="password"]', 'abcdefgh');
     await page.click("#login-button");
-    let passwordError = await page.locator('p').nth(1);
-    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください');
+    let passwordError = await page.locator('p').nth(2);
+    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください。');
 
     await page.fill('input[type="password"]', 'Abcd1234');
     await page.click("#login-button");
-    passwordError = await page.locator('p').nth(1);
-    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください');
+    passwordError = await page.locator('p').nth(2);
+    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください。');
 
     await page.fill('input[type="password"]', '12345678');
     await page.click("#login-button");
-    passwordError = await page.locator('p').nth(1);
-    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください');
+    passwordError = await page.locator('p').nth(2);
+    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください。');
 
     await page.fill('input[type="password"]', 'A#ua78');
     await page.click("#login-button");
-    passwordError = await page.locator('p').nth(1);
-    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください');
+    passwordError = await page.locator('p').nth(2);
+    await expect(passwordError).toHaveText('パスワードは8文字以上で、大文字小文字の英数記号を全て含んでください。');
   });
 
-  test('post OK', async ({ page }) => {
+  test('エラーなし', async ({ page }) => {
     await page.fill('input[type="email"]', 'testest@test.com');
     await page.fill('input[type="password"]', '#Pass741');
     await page.click("#login-button");
   
-    const emailError = await page.locator('p').nth(0);
-    const passwordError = await page.locator('p').nth(1);
+    const emailError = await page.locator('p').nth(1);
+    const passwordError = await page.locator('p').nth(2);
     await expect(emailError).toHaveText('');
     await expect(passwordError).toHaveText('');
   });
