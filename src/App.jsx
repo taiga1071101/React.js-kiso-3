@@ -1,11 +1,11 @@
-import Login from './pages/Login.jsx';
-import './App.css';
+import './App.scss';
+import { Router } from './routes/Router.jsx';
 
 function App() {
   return (
-    <>
-      <Login />
-    </>
+    <div>
+      <Router />
+    </div>
   )
 }
 
