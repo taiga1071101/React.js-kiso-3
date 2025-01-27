@@ -8,6 +8,8 @@ export const Home = () => {
       <Link to="/login">ログイン画面へ</Link>
       <br />
       <Link to="/signup">新規登録画面へ</Link>
+      <br />
+      <Link to="/reviewlist">書籍一覧画面へ</Link>
     </div>
   );
 };

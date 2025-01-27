@@ -52,7 +52,7 @@ export const Login = () => {
               },
             })}
           />
-          <p className="error-message">{errors.email?.message}</p>
+          <p className="error-message" id="email-error">{errors.email?.message}</p>
           <br />
 
           <label>パスワード</label>
@@ -66,7 +66,7 @@ export const Login = () => {
               },
             })}
           />
-          <p className="error-message">{errors.password?.message}</p>
+          <p className="error-message" id="password-error">{errors.password?.message}</p>
           <br />
           <button type="submit" id="login-button" disabled={isSubmitting} className="on-login-button">ログイン</button>
         </form>

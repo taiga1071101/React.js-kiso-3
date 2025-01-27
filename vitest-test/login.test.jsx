@@ -3,7 +3,6 @@ import React from 'react';
 import { expect, test } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Login } from '../src/pages/Login.jsx';
-import { App } from '../src/App.jsx';
 import { MemoryRouter } from 'react-router-dom';
 
 test('正しくレンダリングされているか' ,() => {
