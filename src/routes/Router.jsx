@@ -1,19 +1,23 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router';
+import { useSelector } from 'react-redux';
 import { Home } from '../pages/Home.jsx';
 import { SignUp } from '../pages/SignUp.jsx';
 import { Login } from '../pages/Login.jsx';
 import { ReviewList } from '../pages/ReviewList.jsx';
+import { EditUser } from '../pages/Edituser.jsx';
 
 export const Router = () => {
+  const isLogin = useSelector((state) => state.token.value);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route exact path="/" element={<Home />} />
-        <Route exact path="/signup" element={<SignUp />} />
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/reviewlist" element={<ReviewList />} />
+        <Route path="/" element={ isLogin ? <Navigate replase to="/reviewlist" /> : <Home />} />
+        <Route path="/signup" element={ isLogin ? <Navigate replase to="/reviewlist" /> : <SignUp />} />
+        <Route path="/login" element={ isLogin ? <Navigate replase to="/reviewlist" /> : <Login />} />
+        <Route path="/reviewlist" element={<ReviewList />} />
+        <Route path="/profile" element={ isLogin ? <EditUser /> : <Navigate replase to="/login" /> } />
       </Routes>
     </BrowserRouter>
   );

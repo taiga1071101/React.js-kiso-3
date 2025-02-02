@@ -2,21 +2,27 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
 import Compressor from "compressorjs";
 import { url } from '../const';
 import { Header } from '../components/Header';
 import './signUp.scss';
+import { set, clear } from '../redux/tokenSlice.js';
 
 export const SignUp = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const token = useSelector((state) => state.token.value);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const navigate = useNavigate();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
+  
   const onSignUp = async (data) => {
     const { name, email, password, icon } = data;
     const requestData = {
@@ -28,9 +34,14 @@ export const SignUp = () => {
     try {
       const res = await axios.post(`${url}/users`, requestData);  // ユーザー情報作成
       console.log('サインアップに成功しました。', res);
-      const file = FileCompression(icon[0]);
-      await OnIconUpload(res.data.token, icon[0]);
-      navigate('/');
+
+      const file = await FileCompression(icon[0]);
+      console.log('圧縮に成功しました。', file);
+
+      await OnIconUpload(res.data.token, file);
+      
+      dispatch(set(res.data.token));
+      navigate('/reviewlist');
     } catch (err) {
       setErrorMessage(`${err.response?.data?.ErrorMessageJP || `サインアップ中にエラーが発生しました。 ${err}`}`);
     } finally {
@@ -40,40 +51,35 @@ export const SignUp = () => {
 
   // ファイルサイズ圧縮
   const FileCompression = (file) => {
-    new Compressor(file, {
-      quality: 0.8,
-      maxWidth: 100,
-      maxHeight: 100,
-      mimeType: 'image/jpg',
-      success (result) {
-        console.log('圧縮に成功しました。', result);
-        return result;
-      },
-      error (err) {
-        console.error('ファイルサイズ圧縮エラー：', err);
-      }
+    return new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality: 0.8,
+        maxWidth: 100,
+        maxHeight: 100,
+        mimeType: 'image/jpg',
+        success (result) {
+          resolve(result);
+        },
+        error (err) {
+          reject(`ファイルサイズ圧縮エラー：${err}`);
+        }
+      });
     });
   }
 
   // アイコンアップロード
-  const OnIconUpload = (token, file) => {
-    return new Promise((resolve, reject) => {
+  const OnIconUpload = async (token, file) => {
+    try {
       // 圧縮結果をAPIで送信できるようにFormDataに変換
       const formData = new FormData();
       formData.append('icon', file);
 
-      const iconUploadHeaders = { 'Authorization': `Bearer ${token}` };
-      axios
-        .post(`${url}/uploads`, formData, { headers: iconUploadHeaders})
-        .then((res) => {
-          console.log('アップロードに成功しました。', res);
-          resolve(res);
-        })
-        .catch((err) => {
-          setErrorMessage(`${err.response?.data?.ErrorMessageJP || `画像アップロード中にエラーが発生しました。 ${err}`}`);
-          reject(err);
-        });
-    });
+      const headers = { 'Authorization': `Bearer ${token}` };
+      const res = await axios.post(`${url}/uploads`, formData, { headers: headers});
+      console.log('アップロードに成功しました。', res);
+    } catch(err) {
+      setErrorMessage(`${err.response?.data?.ErrorMessageJP || `画像アップロード中にエラーが発生しました。 ${err}`}`);
+    }
   }
 
   return (
@@ -81,6 +87,7 @@ export const SignUp = () => {
       <Header />
       <main className="signup">
         <h1>新規登録画面</h1>
+        <p>{ token }</p>
         <p className="error-message">{errorMessage}</p>
         <form onSubmit={handleSubmit(onSignUp)}>
           <label>ユーザ名</label>

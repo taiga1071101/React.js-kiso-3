@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { set, clear } from '../redux/tokenSlice.js';
 import { url } from '../const';
 import { Header } from '../components/Header';
 import './login.scss';
@@ -15,6 +17,8 @@ export const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);  // 送信中の状態を管理して、連続でボタンを押せないようにする
   const [errorMessage, setErrorMessage] = useState(''); // APIレスポンスのエラーを格納
   const navigate = useNavigate();
+  const token = useSelector((state) => state.token.value);
+  const dispatch = useDispatch();
 
   const onLogin = async (data) => {
     try {
@@ -26,7 +30,9 @@ export const Login = () => {
       };
       const res = await axios.post(`${url}/signin`, requestData);
       console.log('ログインに成功しました。', res);
-      navigate('/');
+      dispatch(set(res.data.token));
+      setErrorMessage('');
+      navigate('/reviewList');
     } catch (err) {
       setErrorMessage(`${err.response?.data?.ErrorMessageJP || `ログイン中にエラーが発生しました。 ${err}`}`);
     } finally {
@@ -39,6 +45,7 @@ export const Login = () => {
       <Header />
       <main className="login">
         <h1>ログイン画面</h1>
+        <p>{token}</p>
         <p className="error-message">{errorMessage}</p>
         <form onSubmit={handleSubmit(onLogin)}>
           <label>メールアドレス</label>
