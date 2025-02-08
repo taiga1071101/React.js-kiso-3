@@ -7,6 +7,7 @@ import { Login } from '../pages/Login.jsx';
 import { ReviewList } from '../pages/ReviewList.jsx';
 import { EditUser } from '../pages/Edituser.jsx';
 import { NewReview } from '../pages/NewReview.jsx';
+import { ReviewDetail } from '../pages/ReviewDetail.jsx';
 
 export const Router = () => {
   const isLogin = useSelector((state) => state.token.value);
@@ -20,6 +21,7 @@ export const Router = () => {
         <Route path="/reviewlist" element={<ReviewList />} />
         <Route path="/profile" element={ isLogin ? <EditUser /> : <Navigate replase to="/login" /> } />
         <Route path="/new" element={ isLogin ? <NewReview /> : <Navigate replase to="/login" /> } />
+        <Route path='/detail/:review_id' element={ isLogin ? <ReviewDetail /> : <Navigate replase to="/login" /> } />
       </Routes>
     </BrowserRouter>
   );
